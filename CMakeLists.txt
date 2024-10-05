@@ -8,4 +8,4 @@ target_link_libraries(mark_x -ljansson)
 #add_executable(mark main.c)
 
 #install(TARGETS mark_x DESTINATION bin)
-#install(FILES setup-project-bash.sh setup-project-zsh.sh DESTINATION bin)
+#install(FILES setup-project-bash.sh DESTINATION bin)

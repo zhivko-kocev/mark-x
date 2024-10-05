@@ -11,10 +11,10 @@ int main(const int argc, char *argv[]) {
         return 1;
     }
 
-    char *jsonString = argv[1];
+    const char *jsonString = argv[1];
 
     Project project;
-    getProjectDetails(&project, jsonString);
+    fillProjectDetails(&project, jsonString);
 
     char *dirPath = getDirPath(__FILE__);
 
@@ -22,8 +22,8 @@ int main(const int argc, char *argv[]) {
     const char *name = project.projectName;
     const char *frontend = project.frontendType;
     const char *backend = project.backendType;
-    size_t modelCount = project.modelCount;
-    Model *models = project.models;
+    const size_t modelCount = project.modelCount;
+    const Model *models = project.models;
 
     char *cwd = malloc(PATH_MAX);
     getcwd(cwd, PATH_MAX);
@@ -32,11 +32,13 @@ int main(const int argc, char *argv[]) {
     sprintf(backendDir, "%s/%s/backend/src/main/java/com/example/backend", cwd, name);
 
 
-    createProject(dirPath, cwd, name, frontend, backend,backendDir);
+    createProject(dirPath, cwd, name, frontend, backend, backendDir);
+
     for (size_t i = 0; i < modelCount; i++) {
-        createRestController(backendDir,&models[i]);
-        createService(backendDir,&models[i]);
-        createRepository(backendDir,&models[i]);
+        createRestController(backendDir, &models[i]);
+        createService(backendDir, &models[i]);
+        createRepository(backendDir, &models[i]);
+        createModels(backendDir, &models[i]);
     }
 
     free(dirPath);

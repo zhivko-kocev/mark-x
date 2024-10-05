@@ -4,7 +4,7 @@
 #include <linux/limits.h>
 #include <stdio.h>
 
-void getProjectDetails(Project *project, const char *jsonString) {
+void fillProjectDetails(Project *project, const char *jsonString) {
     json_error_t error;
     json_t *root = json_loads(jsonString, 0, &error);
 
@@ -71,7 +71,7 @@ void createProject(char *dirPath, char *cwd, const char *name, const char *front
 
     char *createBackFront = malloc(112 + strlen(name) + 1 + strlen(frontend) + 1 + strlen(backend) + 1);
     sprintf(createBackFront,
-            "%s/setup-project-zsh.sh %s %s %s", dirPath,
+            "%s/setup-project-bash.sh %s %s %s", dirPath,
             name, frontend, backend);
     system(createBackFront);
     free(createBackFront);
@@ -139,5 +139,28 @@ void createRepository(const char *backendDir, const Model *model) {
         file,
         "package com.example.backend.repositories;\n\nimport org.springframework.data.jpa.repository.JpaRepository;\nimport com.example.backend.models.%s;\n\npublic interface %sRepository extends JpaRepository<%s, Long> { }\n",
         model->modelName, model->modelName, model->modelName);
+    fclose(file);
+}
+
+void createModels(const char *backendDir, const Model *model) {
+    char repositoryFileName[PATH_MAX];
+    snprintf(repositoryFileName, sizeof(repositoryFileName), "%s/models/%s.java", backendDir,
+             model->modelName);
+
+    // Open the file for writing
+    FILE *file = fopen(repositoryFileName, "w");
+    if (!file) {
+        perror("Failed to create repository file");
+        return;
+    }
+    fprintf(
+        file,
+        "package com.example.backend.models;\nimport lombok.Getter\nimport lombok.Setter\n\n@Getter\n@Setter\npublic class %s{\n",
+        model->modelName);
+
+    for (int i = 0; i < model->attrCount; ++i) {
+        fprintf(file, "%s %s;\n", model->attributes[i].type, model->attributes[i].name);
+    }
+    fprintf(file, "}\n");
     fclose(file);
 }
