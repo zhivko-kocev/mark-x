@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/mark_x.dir/mark_xi/script.c.o CMakeFiles/mark_x.dir/mark_xi/utils/utils.c.o -o mark_x  -ljansson 
