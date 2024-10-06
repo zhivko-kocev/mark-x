@@ -1,0 +1,3 @@
+/home/zhivko-kocev/.local/bin/mark_x
+/home/zhivko-kocev/.local/bin/setup-project-bash.sh
+/home/zhivko-kocev/.local/bin/mark.js

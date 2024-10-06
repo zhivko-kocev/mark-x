@@ -8,9 +8,7 @@
 
 void fillProjectDetails(Project *project, const char *jsonString);
 
-char *getDirPath(const char *fullPath);
-
-void createProject(char *dirPath, char *cwd, const char *name, const char *frontend, const char *backend,
+void createProject(char *dirPath,char *cwd, const char *name, const char *frontend, const char *backend,
                    char *backendDir);
 
 void createRestController(const char *backendDir, const Model *model);

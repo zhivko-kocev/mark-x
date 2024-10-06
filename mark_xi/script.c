@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <limits.h>
+#include <string.h>
 #include "structs/project.h"
 #include "utils/utils.h"
 
@@ -16,7 +16,10 @@ int main(const int argc, char *argv[]) {
     Project project;
     fillProjectDetails(&project, jsonString);
 
-    char *dirPath = getDirPath(__FILE__);
+    char dirPath[PATH_MAX];
+    const char *directory = strrchr(__FILE__, '/');
+
+    strncpy(dirPath, __FILE__, directory - __FILE__);
 
 
     const char *name = project.projectName;
@@ -25,10 +28,10 @@ int main(const int argc, char *argv[]) {
     const size_t modelCount = project.modelCount;
     const Model *models = project.models;
 
-    char *cwd = malloc(PATH_MAX);
+    char cwd[PATH_MAX];
     getcwd(cwd, PATH_MAX);
 
-    char *backendDir = malloc(PATH_MAX);
+    char backendDir[PATH_MAX + strlen(cwd) + strlen(name) + 2];
     sprintf(backendDir, "%s/%s/backend/src/main/java/com/example/backend", cwd, name);
 
 
@@ -41,8 +44,5 @@ int main(const int argc, char *argv[]) {
         createModels(backendDir, &models[i]);
     }
 
-    free(dirPath);
-    free(cwd);
-    free(backendDir);
     return 0;
 }

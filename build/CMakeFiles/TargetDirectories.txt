@@ -1,0 +1,7 @@
+/home/zhivko-kocev/Codes/personal-projects/mark-x/build/CMakeFiles/mark_x.dir
+/home/zhivko-kocev/Codes/personal-projects/mark-x/build/CMakeFiles/edit_cache.dir
+/home/zhivko-kocev/Codes/personal-projects/mark-x/build/CMakeFiles/rebuild_cache.dir
+/home/zhivko-kocev/Codes/personal-projects/mark-x/build/CMakeFiles/list_install_components.dir
+/home/zhivko-kocev/Codes/personal-projects/mark-x/build/CMakeFiles/install.dir
+/home/zhivko-kocev/Codes/personal-projects/mark-x/build/CMakeFiles/install/local.dir
+/home/zhivko-kocev/Codes/personal-projects/mark-x/build/CMakeFiles/install/strip.dir

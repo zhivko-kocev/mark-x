@@ -54,37 +54,27 @@ void fillProjectDetails(Project *project, const char *jsonString) {
     json_decref(root);
 }
 
-char *getDirPath(const char *fullPath) {
-    char *dirPath = malloc(PATH_MAX);
-    const char *directory = strrchr(fullPath, '/');
-
-    strncpy(dirPath, fullPath, directory - fullPath);
-
-    return dirPath;
-}
 
 void createProject(char *dirPath, char *cwd, const char *name, const char *frontend, const char *backend,
                    char *backendDir) {
-    char *mkdirCommand = malloc(7 + strlen(name) + 1 + strlen(cwd) + 1);
+    size_t nameLen = strlen(name);
+    char mkdirCommand[nameLen + strlen(cwd) + 10];
     sprintf(mkdirCommand, "mkdir %s/%s", cwd, name);
     system(mkdirCommand);
-    free(mkdirCommand);
 
 
-    char *createBackFront = malloc(112 + strlen(name) + 1 + strlen(frontend) + 1 + strlen(backend) + 1);
+    char createBackFront[PATH_MAX + nameLen + strlen(frontend) + strlen(backend) + 1];
     sprintf(createBackFront,
             "%s/setup-project-bash.sh %s %s %s", dirPath,
             name, frontend, backend);
     system(createBackFront);
-    free(createBackFront);
 
     char *dirs[] = {"controllers", "services", "repositories", "models", "exceptions", "utils"};
-    char *subdirs = malloc(PATH_MAX + 7);
     for (int i = 0; i < 6; i++) {
+        char subdirs[PATH_MAX + 8];
         sprintf(subdirs, "mkdir %s/%s", backendDir, dirs[i]);
         system(subdirs);
     }
-    free(subdirs);
 }
 
 void createRestController(const char *backendDir, const Model *model) {

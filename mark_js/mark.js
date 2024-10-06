@@ -91,7 +91,7 @@ const main = async () => {
     try {
         const data = await generateProjectJson();
 
-        exec(`/usr/local/bin/mark-dir/mark_x '${data}'`, (error, stdout, stderr) => {
+        exec(`mark_x '${data}'`, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error executing mark: ${error}`);
                 return;
