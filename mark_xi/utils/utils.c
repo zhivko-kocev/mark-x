@@ -1,4 +1,6 @@
 #include "utils.h"
+
+#include <ctype.h>
 #include <jansson.h>
 #include <string.h>
 #include <linux/limits.h>
@@ -117,7 +119,7 @@ void createService(const char *backendDir, const Model *model) {
     }
     fprintf(
         file,
-        "package com.example.backend.services;\n\nimport org.springframework.stereotype.Service;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport com.example.backend.models.%s;\nimport com.example.backend.repositories.%sRepository;\n\n@Service\npublic class %sService {\n@Autowired\nprivate %sRepository %sRepository;\npublic List<%s> getAll%s() { return %sRepository.findAll(); }\npublic %s create%s(%s %s) { return %sRepository.save(%s); }\n}",
+        "package com.example.backend.services;\n\nimport org.springframework.stereotype.Service;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport com.example.backend.models.%s;\nimport com.example.backend.repositories.%sRepository;\n\nimport java.util.List;\n\n@Service\npublic class %sService {\n@Autowired\nprivate %sRepository %sRepository;\npublic List<%s> getAll%s() { return %sRepository.findAll(); }\npublic %s create%s(%s %s) { return %sRepository.save(%s); }\n}",
         model->modelName, model->modelName, model->modelName, model->modelName, model->modelName, model->modelName,
         model->modelName, model->modelName, model->modelName, model->modelName, model->modelName, model->modelName,
         model->modelName, model->modelName);
@@ -155,7 +157,7 @@ void createModels(const char *backendDir, const Model *model) {
     }
     fprintf(
         file,
-        "package com.example.backend.models;\nimport lombok.Getter\nimport lombok.Setter\n\n@Getter\n@Setter\npublic class %s{\n",
+        "package com.example.backend.models;\nimport lombok.Getter;\nimport lombok.Setter;\n\n@Getter\n@Setter\npublic class %s{\n",
         model->modelName);
 
     for (int i = 0; i < model->attrCount; ++i) {

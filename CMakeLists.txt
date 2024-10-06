@@ -5,7 +5,8 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(mark_x mark_xi/script.c mark_xi/utils/utils.c)
 target_link_libraries(mark_x -ljansson)
-#add_executable(mark main.c)
 
-#install(TARGETS mark_x DESTINATION bin)
-#install(FILES setup-project-bash.sh DESTINATION bin)
+install(TARGETS mark_x DESTINATION bin/mark-dir)
+install(FILES mark_xi/setup-project-bash.sh DESTINATION bin/mark-dir)
+install(FILES mark_js/mark.js DESTINATION bin PERMISSIONS WORLD_EXECUTE WORLD_READ)
+

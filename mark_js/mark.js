@@ -1,5 +1,7 @@
-import inquirer from "inquirer";
-import {exec} from "child_process";
+#!/usr/bin/env node
+
+const inquirer = require("inquirer").default;
+const { exec } = require("child_process");
 
 const askQuestions = () => {
     const questions = [
@@ -62,7 +64,7 @@ const generateProjectJson = async () => {
             const modelDetails = await askModelDetails();
             const modelAttributes = modelDetails.attributes.split(",").map(attr => {
                 const [name, type] = attr.split(":");
-                return {name: name.trim(), type: type.trim()};
+                return { name: name.trim(), type: type.trim() };
             });
 
             models.push({
@@ -84,16 +86,23 @@ const generateProjectJson = async () => {
     return JSON.stringify(projectJson);
 };
 
-const data = await generateProjectJson();
+// Wrap in an async function to use 'await'
+const main = async () => {
+    try {
+        const data = await generateProjectJson();
 
-console.log(data);
+        exec(`/usr/local/bin/mark-dir/mark_x '${data}'`, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error executing mark: ${error}`);
+                return;
+            }
 
-// exec(`mark '${data}'`, (error, stdout, stderr) => {
-//     if (error) {
-//         console.error(`Error executing mark: ${error}`);
-//         return;
-//     }
-//
-//     console.log(`Output: ${stdout}`);
-//     console.error(`Error output (if any): ${stderr}`);
-// });
+            console.log(`Output: ${stdout}`);
+            console.log('Succesfully created the project!');
+        });
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+};
+
+main(); // Call the main function
