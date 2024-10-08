@@ -1,108 +1,200 @@
 #!/usr/bin/env node
 
 const inquirer = require("inquirer").default;
-const { exec } = require("child_process");
+const fs = require("fs");
+const path = require('path');
 
-const askQuestions = () => {
+const askBasics = () => {
     const questions = [
         {
             name: "projectName",
             type: "input",
-            message: "Enter the project name:"
+            message: "Enter the project name:",
         },
         {
-            name: "backendType",
+            name: "projectType",
             type: "list",
-            message: "Select a backend type:",
-            choices: ["Spring Boot", "Express.js - (not implemented yet)", "Django  - (not implemented yet)"],
-            default: "Spring Boot"
-        },
-        {
-            name: "frontendType",
-            type: "list",
-            message: "Select a frontend type:",
-            choices: ["react", "vue"],
-            default: "react"
-        },
-        {
-            name: "addModels",
-            type: "confirm",
-            message: "Do you want to add models and generate endpoints to your project?"
+            message: "Select project type:",
+            choices: [
+                {name: "Client Side Render", value: "csr"},
+                {name: "Server Side Render", value: "ssr"}
+            ],
         }
     ];
 
     return inquirer.prompt(questions);
 };
 
-const askModelDetails = () => {
-    return inquirer.prompt([
+const askFrontend = () => {
+    const questions = [
+        {
+            name: "frontendType",
+            type: "list",
+            message: "Select a frontend type:",
+            choices: [
+                {name: "Vanilla", value: "vanilla"},
+                {name: "React", value: "react"},
+                {name: "Vue", value: "vue"},
+                {name: "Preact", value: "preact"},
+                {name: "Lit", value: "lit"},
+                {name: "Svelte", value: "svelte"},
+                {name: "Solid", value: "solid"},
+                {name: "Qwik", value: "qwik"}
+            ]
+        }
+    ];
+
+    return inquirer.prompt(questions);
+};
+
+const askBackend = () => {
+    const questions = [
+        {
+            name: "backendType",
+            type: "list",
+            message: "Select a backend type:",
+            choices: [
+                {name: "Spring", value: "spring"},
+                {name: "Express", value: "express"},
+                {name: ".NET", value: "dotnet"}
+            ]
+        }
+    ];
+
+    return inquirer.prompt(questions);
+};
+
+const askModel = () => {
+    const questions = [
+        {
+            name: "addModels",
+            type: "list",
+            message: "Do you want to add models and generate endpoints to your project?",
+            choices: [
+                {name: "Yes", value: true},
+                {name: "No", value: false}
+            ],
+        }
+    ]
+    return inquirer.prompt(questions);
+};
+
+const askModelDetails = async () => {
+    const modelQuestions = [
         {
             name: "modelName",
             type: "input",
-            message: "Enter model name:"
+            message: "Enter model name:",
         },
         {
-            name: "attributes",
+            name: "numberOfAttributes",
             type: "input",
-            message: "Enter model attributes (comma separated, e.g., name:string, age:int):"
-        },
+            message: "How many attributes do you want to add?",
+            validate: input => {
+                const number = parseInt(input);
+                return !isNaN(number) && number > 0 ? true : 'Please enter a valid number.';
+            }
+        }
+    ];
+
+    const answers = await inquirer.prompt(modelQuestions);
+    const {numberOfAttributes} = answers;
+
+    const attributes = [];
+
+    for (let i = 0; i < numberOfAttributes; i++) {
+        const attributeDetails = await inquirer.prompt([
+            {
+                name: "attributeName",
+                type: "input",
+                message: `Enter name for attribute ${i + 1}:`,
+            },
+            {
+                name: "attributeType",
+                type: "list",
+                message: `Select type for attribute ${i + 1}:`,
+                choices: [
+                    {name: "String", value: "string"},
+                    {name: "Integer", value: "int"},
+                    {name: "Boolean", value: "boolean"},
+                    {name: "Float", value: "float"},
+                    {name: "Double", value: "double"},
+                ],
+            }
+        ]);
+
+        attributes.push({
+            name: attributeDetails.attributeName,
+            type: attributeDetails.attributeType
+        });
+    }
+
+    const addMoreModelsQuestion = [
         {
             name: "addMoreModels",
-            type: "confirm",
-            message: "Do you want to add more models?"
+            type: "list",
+            message: "Do you want to add more models?",
+            choices: [
+                {name: "Yes", value: true},
+                {name: "No", value: false}
+            ],
         }
-    ]);
+    ];
+
+    const addMoreModelsAnswer = await inquirer.prompt(addMoreModelsQuestion);
+    return {
+        modelName: answers.modelName,
+        attributes: attributes,
+        addMoreModels: addMoreModelsAnswer.addMoreModels
+    };
 };
 
 const generateProjectJson = async () => {
-    const answers = await askQuestions();
+    let basics = await askBasics();
+    let frontend, backend, answers;
+    if (basics.projectType === "csr") {
+        frontend = await askFrontend();
+    }
+    backend = await askBackend();
+
+    answers = await askModel();
+
     const models = [];
 
-    if (answers["addModels"]) {
+    if (answers.addModels) {
         let addMore = true;
         while (addMore) {
             const modelDetails = await askModelDetails();
-            const modelAttributes = modelDetails.attributes.split(",").map(attr => {
-                const [name, type] = attr.split(":");
-                return { name: name.trim(), type: type.trim() };
-            });
-
             models.push({
                 modelName: modelDetails.modelName,
-                attributes: modelAttributes
+                attributes: modelDetails.attributes
             });
 
-            addMore = modelDetails["addMoreModels"];
+            addMore = modelDetails.addMoreModels;
         }
     }
 
     const projectJson = {
-        projectName: answers.projectName,
-        backendType: answers.backendType,
-        frontendType: answers.frontendType,
+        projectName: basics.projectName,
+        frontendType: typeof frontend !== "undefined" ? frontend.frontendType : "none",
+        backendType: backend.backendType,
         models: models
     };
 
-    return JSON.stringify(projectJson);
+    return JSON.stringify(projectJson, null, 4);  // Pretty-printing the JSON
 };
 
-// Wrap in an async function to use 'await'
 const main = async () => {
     try {
         const data = await generateProjectJson();
 
-        exec(`mark_x '${data}'`, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error executing mark: ${error}`);
-                return;
-            }
-
-            console.log(`Output: ${stdout}`);
-            console.log('Succesfully created the project!');
-        });
+        const dataFilePath = path.resolve(__dirname, './data.json');
+        fs.writeFileSync(dataFilePath, data);
+        console.log(`Project JSON written to ${dataFilePath}`);
     } catch (error) {
         console.error('An error occurred:', error);
+        process.exit(1);
     }
 };
 
-main(); // Call the main function
+main().then(() => console.log("Thanks!"));

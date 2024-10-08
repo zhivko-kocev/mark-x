@@ -55,28 +55,6 @@ void fillProjectDetails(Project *project, const char *jsonString) {
 }
 
 
-void createProject(char *dirPath, char *cwd, const char *name, const char *frontend, const char *backend,
-                   char *backendDir) {
-    size_t nameLen = strlen(name);
-    char mkdirCommand[nameLen + strlen(cwd) + 10];
-    sprintf(mkdirCommand, "mkdir %s/%s", cwd, name);
-    system(mkdirCommand);
-
-
-    char createBackFront[PATH_MAX + nameLen + strlen(frontend) + strlen(backend) + 1];
-    sprintf(createBackFront,
-            "%s/setup-project-bash.sh %s %s %s", dirPath,
-            name, frontend, backend);
-    system(createBackFront);
-
-    char *dirs[] = {"controllers", "services", "repositories", "models", "exceptions", "utils"};
-    for (int i = 0; i < 6; i++) {
-        char subdirs[PATH_MAX + 8];
-        sprintf(subdirs, "mkdir %s/%s", backendDir, dirs[i]);
-        system(subdirs);
-    }
-}
-
 void createRestController(const char *backendDir, const Model *model) {
     char controllerFileName[PATH_MAX];
     snprintf(controllerFileName, sizeof(controllerFileName), "%s/controllers/%sController.java", backendDir,
