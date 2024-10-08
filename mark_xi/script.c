@@ -9,7 +9,7 @@
 
 int main() {
     char filePath[1024];
-    ssize_t count = readlink("/proc/self/exe", filePath, 1024);
+    const ssize_t count = readlink("/proc/self/exe", filePath, 1024);
 
     if (count == -1) {
         perror("readlink");
@@ -29,7 +29,7 @@ int main() {
     }
 
     fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
+    const long fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
 
     char *content = malloc(fileSize * sizeof(char));

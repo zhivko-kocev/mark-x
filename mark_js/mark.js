@@ -177,7 +177,7 @@ const generateProjectJson = async () => {
     const projectJson = {
         projectName: basics.projectName,
         frontendType: typeof frontend !== "undefined" ? frontend.frontendType : "none",
-        backendType: backend.backendType,
+        backendType: basics.projectType === "ssr" ? backend.backendType + "-ssr" : backend.backendType + "-csr",
         models: models
     };
 
