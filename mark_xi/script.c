@@ -71,7 +71,8 @@ int main() {
     sprintf(setupPath, "%s/setup.sh %s %s %s", filePath, name, frontend, backend);
     system(setupPath);
 
-    //
+    //├── Controllers/
+9
     // for (size_t i = 0; i < modelCount; i++) {
     //     createRestController(backendDir, &models[i]);
     //     createService(backendDir, &models[i]);
