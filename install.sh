@@ -2,7 +2,9 @@
 
 npm install -g inquirer
 
+if [ -z "$NODE_PATH" ]; then
 echo "export NODE_PATH=$(npm root -g)" >> ~/.profile
+fi
 
 cmake -B ./build -S .
 cmake --build ./build --target mark_x -j 6
