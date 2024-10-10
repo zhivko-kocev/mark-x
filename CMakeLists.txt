@@ -15,4 +15,5 @@ install(FILES mark_js/mark.js DESTINATION bin/mark_xi PERMISSIONS WORLD_EXECUTE 
 install(DIRECTORY mark_xi/skeletons DESTINATION bin/mark_xi)
 install(DIRECTORY mark_xi/templates DESTINATION bin/mark_xi)
 install(DIRECTORY mark_xi/models DESTINATION bin/mark_xi)
+install(FILES tt DESTINATION bin/mark_xi PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 

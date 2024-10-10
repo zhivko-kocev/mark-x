@@ -73,8 +73,11 @@ void writeModelsJSON(const char *jsonString, char *filePath) {
             json_decref(root);
             return;
         }
-        json_t *model = json_array_get(models, i);
-        json_object_set(new_root, "model", model);
+        const json_t *model = json_array_get(models, i);
+        json_t *name = json_object_get(model, "modelName");
+        json_t *attrs = json_object_get(model, "attributes");
+        json_object_set(new_root, "modelName", name);
+        json_object_set(new_root, "attributes", attrs);
 
         const char *modelName = json_string_value(json_object_get(model, "modelName"));
         char modelPath[PATH_MAX];
@@ -92,13 +95,9 @@ void writeModelsJSON(const char *jsonString, char *filePath) {
     json_decref(root);
 }
 
-void writeToFile(const char *fullPath, char *modelName, const char *extension) {
-    char filePath[PATH_MAX];
-    sprintf(filePath, "%s/%s%s", fullPath, modelName, extension);
-    FILE *file = fopen(filePath, "w");
-    if (!file) {
-        fprintf(stderr, "Failed to open file %s\n", filePath);
-        return;
-    }
-    fprintf(file, "Testing!\n");
+void writeToFile(const char *fullPath, char *templatePath, const char *filePath, char *modelName) {
+    char fullCommand[PATH_MAX];
+    sprintf(fullCommand, "cat %s | %s/tt %s/models/%s.json > %s", templatePath, filePath, filePath, modelName,
+            fullPath);
+    system(fullCommand);
 }

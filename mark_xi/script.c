@@ -93,7 +93,7 @@ int main() {
         return 1;
     }
     char fullRootPath[PATH_MAX];
-    sprintf(fullRootPath, "%s%s/", root_path, backend);
+    sprintf(fullRootPath, "/%s%s", backend, root_path);
 
     char *isCsr = strstr(backend, "csr");
 
@@ -102,19 +102,36 @@ int main() {
         return 1;
     }
 
-    const config_setting_t *setting = config_lookup(&cfg, "Directories");
-    const int settingCount = config_setting_length(setting);
-    if (setting == NULL) {
+    const config_setting_t *dirSetting = config_lookup(&cfg, "Directories");
+    const int dirSettingCount = config_setting_length(dirSetting);
+    if (dirSetting == NULL) {
         printf("Failed to get Directories setting\n");
         return 1;
     }
 
+    const config_setting_t *fileSetting = config_lookup(&cfg, "Files");
+    const int fileSettingCount = config_setting_length(dirSetting);
+    if (fileSetting == NULL) {
+        printf("Failed to get Directories setting\n");
+        return 1;
+    }
+
+    if (dirSettingCount != fileSettingCount) {
+        printf("Directories count does not match file settings\n");
+        return 1;
+    }
+
     for (size_t i = 0; i < modelCount; ++i) {
-        for (int j = 0; j < settingCount; ++j) {
+        for (int j = 0; j < dirSettingCount; ++j) {
+            const config_setting_t *dir = config_setting_get_elem(dirSetting, j);
             char fullPath[PATH_MAX + strlen(fullRootPath)];
-            sprintf(fullPath, "./%s%s%s", name, (isCsr) ? fullRootPath : root_path,
-                    config_setting_get_string(config_setting_get_elem(setting, j)));
-            writeToFile(fullPath, models[i].modelName, extension);
+            const char *fileName = config_setting_get_string(config_setting_get_elem(fileSetting, j));
+            sprintf(fullPath, "./%s%s/%s/%s%s%s", name, (isCsr) ? fullRootPath : root_path,
+                    config_setting_get_string(dir), models[i].modelName, fileName,
+                    extension);
+            char templatePath[PATH_MAX];
+            sprintf(templatePath, "%s/templates/%s-templates/%s.tt", filePath, backend,config_setting_name(dir));
+            writeToFile(fullPath, templatePath, filePath, models[i].modelName);
         }
     }
 

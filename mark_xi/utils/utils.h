@@ -10,5 +10,5 @@ void fillProjectDetails(Project *project, const char *jsonString);
 
 void writeModelsJSON(const char *jsonString, char *filePath);
 
-void writeToFile(const char *fullPath, char *modelName,const char *extension);
+void writeToFile(const char *fullPath, char *templatePath, const char *filePath, char *modelName);
 #endif //UTILS_H
