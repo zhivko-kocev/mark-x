@@ -50,8 +50,8 @@ Contains the interactive CLI script built with Inquirer.js. This script collects
 
 ### mark_xi/
 
-- **templates/**: Contains template files for various parts of the generated application. - (not implemented!)
-- **skeletons/**: Holds skeleton structures for different types of projects. - (needs makeup xd! )
+- **templates/**: Contains template files for various parts of the generated application. - (needs makeup XD!)
+- **skeletons/**: Holds skeleton structures for different types of projects. - (needs makeup XD! )
 - **structs/**: Includes structure definitions used in the project generation process.
 - **utils/**: Utility functions and helpers for the C script.
 - **script.c**: The main C script that generates the project based on user input.
