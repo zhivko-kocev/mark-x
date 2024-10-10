@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>codechem-duck-game</artifactId>
+	<artifactId>spring-csr</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>codechem-duck-game</name>
-	<description>codechem-duck-game</description>
+	<name>spring-csr</name>
+	<description>spring-csr</description>
 	<url/>
 	<licenses>
 		<license/>

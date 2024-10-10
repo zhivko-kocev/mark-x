@@ -8,12 +8,7 @@
 
 void fillProjectDetails(Project *project, const char *jsonString);
 
-void createRestController(const char *backendDir, const Model *model);
+void writeModelsJSON(const char *jsonString, char *filePath);
 
-void createService(const char *backendDir, const Model *model);
-
-void createRepository(const char *backendDir, const Model *model);
-
-void createModels(const char *backendDir, const Model *model);
-
+void writeToFile(const char *fullPath, char *modelName,const char *extension);
 #endif //UTILS_H

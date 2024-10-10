@@ -1,13 +1,13 @@
-package com.example.codechemduckgame;
+package com.example.springcsr;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CodechemDuckGameApplication {
+public class SpringCsrApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CodechemDuckGameApplication.class, args);
+		SpringApplication.run(SpringCsrApplication.class, args);
 	}
 
 }

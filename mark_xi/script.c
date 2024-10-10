@@ -6,6 +6,7 @@
 #include "structs/project.h"
 #include "utils/utils.h"
 #include <sys/stat.h>
+#include <libconfig.h>
 
 int main() {
     char filePath[1024];
@@ -45,7 +46,6 @@ int main() {
 
     Project project;
     fillProjectDetails(&project, content);
-    free(content);
 
     const char *name = project.projectName;
     size_t nameLength = strlen(name);
@@ -71,14 +71,52 @@ int main() {
     sprintf(setupPath, "%s/setup.sh %s %s %s", filePath, name, frontend, backend);
     system(setupPath);
 
-    //├── Controllers/
-9
-    // for (size_t i = 0; i < modelCount; i++) {
-    //     createRestController(backendDir, &models[i]);
-    //     createService(backendDir, &models[i]);
-    //     createRepository(backendDir, &models[i]);
-    //     createModels(backendDir, &models[i]);
-    // }
+    writeModelsJSON(content, filePath);
+    free(content);
+
+    config_t cfg;
+    const char *root_path;
+    const char *extension;
+    config_init(&cfg);
+
+    char configPath[PATH_MAX];
+    sprintf(configPath, "%s/templates/%s-templates/%s.conf", filePath, backend, backend);
+
+
+    if (!config_read_file(&cfg, configPath)) {
+        printf("Failed to read config file\n");
+        return 1;
+    }
+
+    if (!config_lookup_string(&cfg, "Root.path", &root_path)) {
+        printf("Failed to get root path\n");
+        return 1;
+    }
+    char fullRootPath[PATH_MAX];
+    sprintf(fullRootPath, "%s%s/", root_path, backend);
+
+    char *isCsr = strstr(backend, "csr");
+
+    if (!config_lookup_string(&cfg, "Extension.type", &extension)) {
+        printf("Failed to get extension type\n");
+        return 1;
+    }
+
+    const config_setting_t *setting = config_lookup(&cfg, "Directories");
+    const int settingCount = config_setting_length(setting);
+    if (setting == NULL) {
+        printf("Failed to get Directories setting\n");
+        return 1;
+    }
+
+    for (size_t i = 0; i < modelCount; ++i) {
+        for (int j = 0; j < settingCount; ++j) {
+            char fullPath[PATH_MAX + strlen(fullRootPath)];
+            sprintf(fullPath, "./%s%s%s", name, (isCsr) ? fullRootPath : root_path,
+                    config_setting_get_string(config_setting_get_elem(setting, j)));
+            writeToFile(fullPath, models[i].modelName, extension);
+        }
+    }
 
     return 0;
 }

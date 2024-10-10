@@ -54,83 +54,51 @@ void fillProjectDetails(Project *project, const char *jsonString) {
     json_decref(root);
 }
 
+void writeModelsJSON(const char *jsonString, char *filePath) {
+    json_error_t error;
+    json_t *root = json_loads(jsonString, 0, &error);
 
-void createRestController(const char *backendDir, const Model *model) {
-    char controllerFileName[PATH_MAX];
-    snprintf(controllerFileName, sizeof(controllerFileName), "%s/controllers/%sController.java", backendDir,
-             model->modelName);
-
-    // Open the file for writing
-    FILE *file = fopen(controllerFileName, "w");
-    if (!file) {
-        perror("Failed to create controller file");
+    if (!root) {
+        printf("Error parsing JSON: %s\n", error.text);
         return;
     }
-    fprintf(
-        file,
-        "package com.example.backend.controllers;\n\nimport org.springframework.web.bind.annotation.*;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport com.example.backend.models.%s;\nimport com.example.backend.services.%sService;\nimport java.util.List;\n\n@RestController\n@RequestMapping(\"/%s\")\npublic class %sController {\n@Autowired\nprivate %sService %sService;\n@GetMapping\npublic List<%s> getAll%s() { return %sService.getAll%s(); }\n@PostMapping\npublic %s create%s(@RequestBody %s %s) { return %sService.create%s(%s); }\n}",
-        model->modelName, model->modelName, model->modelName, model->modelName, model->modelName, model->modelName,
-        model->modelName, model->modelName, model->modelName, model->modelName, model->modelName, model->modelName,
-        model->modelName, model->modelName, model->modelName, model->modelName, model->modelName);
-    fclose(file);
+
+    const json_t *models = json_object_get(root, "models");
+    const size_t modelsCount = json_array_size(models);
+
+    for (size_t i = 0; i < modelsCount; ++i) {
+        json_t *new_root = json_object();
+        if (!new_root) {
+            fprintf(stderr, "Failed to create new JSON object\n");
+            json_decref(root);
+            return;
+        }
+        json_t *model = json_array_get(models, i);
+        json_object_set(new_root, "model", model);
+
+        const char *modelName = json_string_value(json_object_get(model, "modelName"));
+        char modelPath[PATH_MAX];
+        sprintf(modelPath, "%s/models/%s.json", filePath, modelName);
+
+        if (json_dump_file(new_root, modelPath, JSON_INDENT(4)) != 0) {
+            fprintf(stderr, "Failed to write new JSON to file\n");
+            json_decref(root);
+            json_decref(new_root);
+            return;
+        }
+        json_decref(new_root);
+    }
+
+    json_decref(root);
 }
 
-void createService(const char *backendDir, const Model *model) {
-    char serviceFileName[PATH_MAX];
-    snprintf(serviceFileName, sizeof(serviceFileName), "%s/services/%sService.java", backendDir, model->modelName);
-
-    // Open the file for writing
-    FILE *file = fopen(serviceFileName, "w");
+void writeToFile(const char *fullPath, char *modelName, const char *extension) {
+    char filePath[PATH_MAX];
+    sprintf(filePath, "%s/%s%s", fullPath, modelName, extension);
+    FILE *file = fopen(filePath, "w");
     if (!file) {
-        perror("Failed to create service file");
+        fprintf(stderr, "Failed to open file %s\n", filePath);
         return;
     }
-    fprintf(
-        file,
-        "package com.example.backend.services;\n\nimport org.springframework.stereotype.Service;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport com.example.backend.models.%s;\nimport com.example.backend.repositories.%sRepository;\n\nimport java.util.List;\n\n@Service\npublic class %sService {\n@Autowired\nprivate %sRepository %sRepository;\npublic List<%s> getAll%s() { return %sRepository.findAll(); }\npublic %s create%s(%s %s) { return %sRepository.save(%s); }\n}",
-        model->modelName, model->modelName, model->modelName, model->modelName, model->modelName, model->modelName,
-        model->modelName, model->modelName, model->modelName, model->modelName, model->modelName, model->modelName,
-        model->modelName, model->modelName);
-    fclose(file);
-}
-
-void createRepository(const char *backendDir, const Model *model) {
-    char repositoryFileName[PATH_MAX];
-    snprintf(repositoryFileName, sizeof(repositoryFileName), "%s/repositories/%sRepository.java", backendDir,
-             model->modelName);
-
-    // Open the file for writing
-    FILE *file = fopen(repositoryFileName, "w");
-    if (!file) {
-        perror("Failed to create repository file");
-        return;
-    }
-    fprintf(
-        file,
-        "package com.example.backend.repositories;\n\nimport org.springframework.data.jpa.repository.JpaRepository;\nimport com.example.backend.models.%s;\n\npublic interface %sRepository extends JpaRepository<%s, Long> { }\n",
-        model->modelName, model->modelName, model->modelName);
-    fclose(file);
-}
-
-void createModels(const char *backendDir, const Model *model) {
-    char repositoryFileName[PATH_MAX];
-    snprintf(repositoryFileName, sizeof(repositoryFileName), "%s/models/%s.java", backendDir,
-             model->modelName);
-
-    // Open the file for writing
-    FILE *file = fopen(repositoryFileName, "w");
-    if (!file) {
-        perror("Failed to create repository file");
-        return;
-    }
-    fprintf(
-        file,
-        "package com.example.backend.models;\nimport lombok.Getter;\nimport lombok.Setter;\n\n@Getter\n@Setter\npublic class %s{\n",
-        model->modelName);
-
-    for (int i = 0; i < model->attrCount; ++i) {
-        fprintf(file, "%s %s;\n", model->attributes[i].type, model->attributes[i].name);
-    }
-    fprintf(file, "}\n");
-    fclose(file);
+    fprintf(file, "Testing!\n");
 }
