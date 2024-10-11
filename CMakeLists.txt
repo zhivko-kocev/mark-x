@@ -8,8 +8,6 @@ target_link_libraries(mark_x -ljansson)
 target_link_libraries(mark_x -lconfig)
 add_executable(mark main.c)
 
-add_executable(test mark_xi/utils/utils.c)
-
 install(TARGETS mark_x DESTINATION bin/mark_xi)
 install(TARGETS mark DESTINATION bin)
 install(FILES mark_xi/setup.sh DESTINATION bin/mark_xi PERMISSIONS WORLD_EXECUTE WORLD_READ WORLD_WRITE OWNER_READ OWNER_EXECUTE OWNER_WRITE GROUP_READ GROUP_EXECUTE GROUP_WRITE)
