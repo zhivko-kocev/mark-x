@@ -56,6 +56,7 @@ Contains the interactive CLI script built with Inquirer.js. This script collects
 - **utils/**: Utility functions and helpers for the C script.
 - **script.c**: The main C script that generates the project based on user input.
 - **setup.sh**: A shell script triggered by script.c to create the main project files.
+- **tt**: A tiny template engine used to generate the code from the templates.
 
 ## Contributing
 
