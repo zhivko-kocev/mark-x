@@ -5,4 +5,13 @@
 #ifndef CONFIG_INFO_H
 #define CONFIG_INFO_H
 
+typedef struct {
+    const char *rootPath;
+    const char *extension;
+    char **dirSetting;
+    char **fileSetting;
+    int dirSettingCount;
+    int fileSettingCount;
+} ConfigInfo;
+
 #endif //CONFIG_INFO_H

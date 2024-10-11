@@ -5,10 +5,20 @@
 #ifndef UTILS_H
 #define UTILS_H
 #include "../structs/project.h"
+#include "../structs/config_info.h"
 
-void fillProjectDetails(Project *project, const char *jsonString);
+int populateExecutablePath(char *execPath, size_t size);
 
-void writeModelsJSON(const char *jsonString, char *filePath);
+char *getJsonContent(char *execPath);
 
-void writeToFile(const char *fullPath, char *templatePath, const char *filePath, char *modelName);
+int populateProjectDetails(Project *project, const char *jsonString);
+
+int createProjectDirectory(const char *projectName);
+
+int writeModelsJSON(const char *jsonString, char *filePath);
+
+int populateConfig(char *execPath, const Project *model, ConfigInfo *configInfo);
+
+int writeToFiles(char *execPath, const Project *project, const ConfigInfo *configInfo);
+
 #endif //UTILS_H

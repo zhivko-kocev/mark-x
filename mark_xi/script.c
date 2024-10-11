@@ -1,138 +1,56 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include "structs/project.h"
+#include "structs/config_info.h"
 #include "utils/utils.h"
-#include <sys/stat.h>
-#include <libconfig.h>
+
+#define MAX_NAME 1024
+#define MAX_BACKEND 1024
+#define MAX_FRONTEND 1024
 
 int main() {
-    char filePath[1024];
-    const ssize_t count = readlink("/proc/self/exe", filePath, 1024);
-
-    if (count == -1) {
-        perror("readlink");
-    }
-
-    filePath[count] = '\0';
-    char *end = strrchr(filePath, '/');
-    *end = '\0';
-
-    char jsonPath[PATH_MAX];
-    sprintf(jsonPath, "%s/data.json", filePath);
-
-    FILE *file = fopen(jsonPath, "r");
-    if (file == NULL) {
-        perror("File not found\n");
+    char execPath[PATH_MAX];
+    if (populateExecutablePath(execPath,PATH_MAX)) {
+        printf("Failed to load executable path\n");
         return 1;
     }
 
-    fseek(file, 0, SEEK_END);
-    const long fileSize = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    char *content = malloc(fileSize * sizeof(char));
-    if (!content) {
-        perror("Memory allocation failed\n");
-        fclose(file);
+    char *content = getJsonContent(execPath);
+    if (!strcmp(content, "err")) {
+        printf("Failed to load json content\n");
         return 1;
     }
-
-    fread(content, 1, fileSize, file);
-    content[fileSize] = '\0';
-    fclose(file);
 
     Project project;
-    fillProjectDetails(&project, content);
+    if (populateProjectDetails(&project, content)) {
+        printf("Failed to load project details\n");
+        return 1;
+    }
 
-    const char *name = project.projectName;
-    size_t nameLength = strlen(name);
+    createProjectDirectory(project.projectName);
 
-    const char *frontend = project.frontendType;
-    size_t frontendLength = strlen(frontend);
-
-    const char *backend = project.backendType;
-    size_t backendLength = strlen(backend);
-
-    const size_t modelCount = project.modelCount;
-    const Model *models = project.models;
-
-
-    char cwd[PATH_MAX];
-    getcwd(cwd, PATH_MAX);
-
-    char newDirPath[PATH_MAX + strlen(name)];
-    sprintf(newDirPath, "%s/%s", cwd, name);
-    mkdir(newDirPath, 0777);
-
-    char setupPath[PATH_MAX + nameLength + frontendLength + backendLength];
-    sprintf(setupPath, "%s/setup.sh %s %s %s", filePath, name, frontend, backend);
+    char setupPath[PATH_MAX + MAX_NAME + MAX_FRONTEND + MAX_BACKEND];
+    sprintf(setupPath, "%s/setup.sh %s %s %s", execPath, project.projectName, project.frontendType,
+            project.backendType);
     system(setupPath);
 
-    writeModelsJSON(content, filePath);
+    if (writeModelsJSON(content, execPath)) {
+        printf("Failed to write models to JSON\n");
+        return 1;
+    }
     free(content);
 
-    config_t cfg;
-    const char *root_path;
-    const char *extension;
-    config_init(&cfg);
-
-    char configPath[PATH_MAX];
-    sprintf(configPath, "%s/templates/%s-templates/%s.conf", filePath, backend, backend);
-
-
-    if (!config_read_file(&cfg, configPath)) {
-        printf("Failed to read config file\n");
+    ConfigInfo configInfo;
+    if (populateConfig(execPath, &project, &configInfo)) {
+        printf("Failed to load config info\n");
         return 1;
     }
 
-    if (!config_lookup_string(&cfg, "Root.path", &root_path)) {
-        printf("Failed to get root path\n");
+    if (writeToFiles(execPath, &project, &configInfo)) {
+        printf("Failed to write the templates to the files!\n");
         return 1;
-    }
-    char fullRootPath[PATH_MAX];
-    sprintf(fullRootPath, "/%s%s", backend, root_path);
-
-    char *isCsr = strstr(backend, "csr");
-
-    if (!config_lookup_string(&cfg, "Extension.type", &extension)) {
-        printf("Failed to get extension type\n");
-        return 1;
-    }
-
-    const config_setting_t *dirSetting = config_lookup(&cfg, "Directories");
-    const int dirSettingCount = config_setting_length(dirSetting);
-    if (dirSetting == NULL) {
-        printf("Failed to get Directories setting\n");
-        return 1;
-    }
-
-    const config_setting_t *fileSetting = config_lookup(&cfg, "Files");
-    const int fileSettingCount = config_setting_length(dirSetting);
-    if (fileSetting == NULL) {
-        printf("Failed to get Directories setting\n");
-        return 1;
-    }
-
-    if (dirSettingCount != fileSettingCount) {
-        printf("Directories count does not match file settings\n");
-        return 1;
-    }
-
-    for (size_t i = 0; i < modelCount; ++i) {
-        for (int j = 0; j < dirSettingCount; ++j) {
-            const config_setting_t *dir = config_setting_get_elem(dirSetting, j);
-            char fullPath[PATH_MAX + strlen(fullRootPath)];
-            const char *fileName = config_setting_get_string(config_setting_get_elem(fileSetting, j));
-            sprintf(fullPath, "./%s%s/%s/%s%s%s", name, (isCsr) ? fullRootPath : root_path,
-                    config_setting_get_string(dir), models[i].modelName, fileName,
-                    extension);
-            char templatePath[PATH_MAX];
-            sprintf(templatePath, "%s/templates/%s-templates/%s.tt", filePath, backend,config_setting_name(dir));
-            writeToFile(fullPath, templatePath, filePath, models[i].modelName);
-        }
     }
 
     return 0;
