@@ -9,6 +9,7 @@
 
 typedef struct {
     char *modelName;
+    char *ModelName;
     Attribute *attributes;
     size_t attrCount;
 } Model;

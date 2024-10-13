@@ -1,10 +1,10 @@
-package com.example.codechemduckgame;
+package com.example.spring_csr;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringCsrTests {
+class SpringCsrApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -124,7 +124,8 @@ const askModelDetails = async () => {
         ]);
 
         attributes.push({
-            name: attributeDetails.attributeName,
+            name: attributeDetails.attributeName.toLowerCase(),
+            Name: attributeDetails.attributeName.charAt(0).toUpperCase() + attributeDetails.attributeName.slice(1),
             type: attributeDetails.attributeType
         });
     }
@@ -166,7 +167,8 @@ const generateProjectJson = async () => {
         while (addMore) {
             const modelDetails = await askModelDetails();
             models.push({
-                modelName: modelDetails.modelName,
+                modelName: modelDetails.modelName.toLowerCase(),
+                ModelName: modelDetails.modelName.charAt(0).toUpperCase() + modelDetails.modelName.slice(1),
                 attributes: modelDetails.attributes
             });
 

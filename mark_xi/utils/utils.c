@@ -83,6 +83,8 @@ int populateProjectDetails(Project *project, const char *jsonString) {
         const json_t *attributes = json_object_get(model, "attributes");
 
         project->models[index].modelName = strdup(json_string_value(json_object_get(model, "modelName")));
+        project->models[index].ModelName = strdup(json_string_value(json_object_get(model, "ModelName")));
+
 
         const size_t attrCount = json_array_size(attributes);
         project->models[index].attributes = malloc(attrCount * sizeof(Attribute));
@@ -93,6 +95,9 @@ int populateProjectDetails(Project *project, const char *jsonString) {
 
             project->models[index].attributes[attr_index].name = strdup(
                 json_string_value(json_object_get(attribute, "name")));
+
+            project->models[index].attributes[attr_index].Name = strdup(
+                json_string_value(json_object_get(attribute, "Name")));
 
             project->models[index].attributes[attr_index].type = strdup(
                 json_string_value(json_object_get(attribute, "type")));
@@ -134,12 +139,15 @@ int writeModelsJSON(const char *jsonString, char *filePath) {
             return 1;
         }
         const json_t *model = json_array_get(models, i);
-        json_t *name = json_object_get(model, "modelName");
+        json_t *nameCapital = json_object_get(model, "ModelName");
+        json_t *nameLower = json_object_get(model, "modelName");
         json_t *attrs = json_object_get(model, "attributes");
-        json_object_set(new_root, "modelName", name);
+
+        json_object_set(new_root, "ModelName", nameCapital);
+        json_object_set(new_root, "modelName", nameLower);
         json_object_set(new_root, "attributes", attrs);
 
-        const char *modelName = json_string_value(json_object_get(model, "modelName"));
+        const char *modelName = json_string_value(json_object_get(model, "ModelName"));
         char modelPath[PATH_MAX];
         sprintf(modelPath, "%s/models/%s.json", filePath, modelName);
 
@@ -228,9 +236,11 @@ int writeToFiles(char *execPath, const Project *project, const ConfigInfo *confi
     for (size_t i = 0; i < project->modelCount; ++i) {
         for (size_t j = 0; j < configInfo->dirSettingCount; ++j) {
             char fullPath[PATH_MAX + PATH_MAX];
+
             sprintf(fullPath, "./%s%s/%s/%s%s%s", project->projectName,
                     strstr(project->backendType, "csr") ? fullRootPath : configInfo->rootPath,
-                    configInfo->dirSetting[j], project->models[i].modelName, configInfo->fileSetting[j],
+                    configInfo->dirSetting[j], project->models[i].ModelName,
+                    !strcmp(configInfo->fileSetting[j], "Model") ? "" : configInfo->fileSetting[j],
                     configInfo->extension);
 
             char templatePath[PATH_MAX + PATH_MAX + MAX_BACKEND];
@@ -239,7 +249,7 @@ int writeToFiles(char *execPath, const Project *project, const ConfigInfo *confi
 
             char fullCommand[PATH_MAX * 5 + MAX_BACKEND];
             sprintf(fullCommand, "cat %s | %s/mu.js %s/models/%s.json > %s", templatePath, execPath, execPath,
-                    project->models[i].modelName,
+                    project->models[i].ModelName,
                     fullPath);
             if (system(fullCommand)) {
                 printf("Failed to execute command\n");

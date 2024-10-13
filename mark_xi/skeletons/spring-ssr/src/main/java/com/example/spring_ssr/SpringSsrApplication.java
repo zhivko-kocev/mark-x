@@ -1,13 +1,13 @@
-package com.example.springcsr;
+package com.example.spring_ssr;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringCsrApplication {
+public class SpringSsrApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringCsrApplication.class, args);
+		SpringApplication.run(SpringSsrApplication.class, args);
 	}
 
 }
