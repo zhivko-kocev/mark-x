@@ -6,7 +6,10 @@ set(CMAKE_C_STANDARD 11)
 add_executable(mark_x mark_xi/script.c mark_xi/utils/utils.c)
 target_link_libraries(mark_x -ljansson)
 target_link_libraries(mark_x -lconfig)
-add_executable(mark main.c)
+
+add_executable(mark main.c mark_xi/utils/utils.c)
+target_link_libraries(mark -ljansson)
+target_link_libraries(mark -lconfig)
 
 install(TARGETS mark_x DESTINATION bin/mark_xi)
 install(TARGETS mark DESTINATION bin)

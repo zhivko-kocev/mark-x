@@ -3,28 +3,28 @@
 //
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include <linux/limits.h>
 
-int main() {
-    char path[1024];
-    ssize_t count = readlink("/proc/self/exe", path, 1024);
+#include "mark_xi/utils/utils.h"
+#define MAX_NAME 1024
 
-    if (count == -1) {
-        perror("readlink");
+int main() {
+    char execPath[PATH_MAX];
+    if (populateExecutablePath(execPath,PATH_MAX)) {
+        printf("Failed to load executable path\n");
+        return 1;
     }
 
-    path[count] = '\0';
-    char *end = strrchr(path, '/');
-    *end = '\0';
+    char command[PATH_MAX + MAX_NAME];
+    sprintf(command, "rm -rf %s/mark_xi/models/*", execPath);
+    system(command);
 
-    char fullPath[PATH_MAX];
-    sprintf(fullPath, "%s/mark_xi/mark.js", path);
+    char fullPath[PATH_MAX + MAX_NAME];
+    sprintf(fullPath, "%s/mark_xi/mark.js", execPath);
 
     system(fullPath);
 
-    sprintf(fullPath, "%s/mark_xi/mark_x", path);
+    sprintf(fullPath, "%s/mark_xi/mark_x", execPath);
     system(fullPath);
     return 0;
 }

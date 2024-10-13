@@ -42,6 +42,10 @@ int main() {
     }
     free(content);
 
+    // char deleteDataJSON[PATH_MAX + MAX_NAME];
+    // sprintf(deleteDataJSON, "rm -rf %s/data.json", execPath);
+    // system(deleteDataJSON);
+
     ConfigInfo configInfo;
     if (populateConfig(execPath, &project, &configInfo)) {
         printf("Failed to load config info\n");
