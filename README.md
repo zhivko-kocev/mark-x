@@ -48,6 +48,10 @@ generation.
 
 Contains the interactive CLI script built with Inquirer.js. This script collects user input and saves it to a JSON file.
 
+### mark_js/mu.js
+
+Contains the template rendering script using Mustache.js. This script gets the template from stdin renders it with the data from a JSON file then writes the data to stdout.
+
 ### mark_xi/
 
 - **templates/**: Contains template files for various parts of the generated application. - (needs makeup XD!)
@@ -56,7 +60,6 @@ Contains the interactive CLI script built with Inquirer.js. This script collects
 - **utils/**: Utility functions and helpers for the C script.
 - **script.c**: The main C script that generates the project based on user input.
 - **setup.sh**: A shell script triggered by script.c to create the main project files.
-- **tt**: A tiny template engine used to generate the code from the templates.
 
 ## Contributing
 
