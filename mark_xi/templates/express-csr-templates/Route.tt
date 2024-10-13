@@ -1,1 +1,5 @@
 Hello {{modelName}} from routes!
+
+{{#attributes}}
+    {{type}} {{name}}
+{{/attributes}}

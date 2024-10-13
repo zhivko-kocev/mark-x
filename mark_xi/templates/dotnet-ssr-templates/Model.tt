@@ -1,1 +1,5 @@
 Hello {{modelName}} from models!
+
+{{#attributes}}
+    {{type}} {{name}}
+{{/attributes}}

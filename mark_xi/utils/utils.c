@@ -238,7 +238,7 @@ int writeToFiles(char *execPath, const Project *project, const ConfigInfo *confi
                     configInfo->fileSetting[j]);
 
             char fullCommand[PATH_MAX * 5 + MAX_BACKEND];
-            sprintf(fullCommand, "cat %s | %s/tt %s/models/%s.json > %s", templatePath, execPath, execPath,
+            sprintf(fullCommand, "cat %s | %s/mu.js %s/models/%s.json > %s", templatePath, execPath, execPath,
                     project->models[i].modelName,
                     fullPath);
             if (system(fullCommand)) {

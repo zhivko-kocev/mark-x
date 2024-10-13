@@ -1,1 +1,5 @@
 Hello {{modelName}} from views!
+
+{{#attributes}}
+    {{type}} {{name}}
+{{/attributes}}

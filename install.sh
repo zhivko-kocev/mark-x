@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 npm install -g inquirer
+npm install -g mustache
 
 if [ -z "$NODE_PATH" ]; then
 echo "export NODE_PATH=$(npm root -g)" >> ~/.profile

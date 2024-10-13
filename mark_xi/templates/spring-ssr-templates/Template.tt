@@ -1,1 +1,5 @@
 Hello {{modelName}} from templates!
+
+{{#attributes}}
+    {{type}} {{name}}
+{{/attributes}}
