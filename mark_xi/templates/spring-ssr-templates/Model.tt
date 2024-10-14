@@ -1,5 +1,21 @@
-Hello {{modelName}} from models!
+package com.example.spring_ssr.models;
 
-{{#attributes}}
-    {{type}} {{name}}
-{{/attributes}}
+import jakarta.persistence.*;
+import lombok.Data;
+
+
+
+@Data
+@Entity
+@Table(name = "{{modelName}}s")
+public class {{ModelName}} {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    {{#attributes}}
+    {{type}} {{name}};
+    {{/attributes}}
+
+}

@@ -1,0 +1,14 @@
+const mongoose = require('mongoose');
+
+const {{modelName}}Schema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  // Add other fields as needed
+}, {
+  timestamps: true
+});
+
+module.exports = mongoose.model('{{ModelName}}', {{modelName}}Schema);

@@ -1,20 +1,16 @@
-const { Sequelize } = require("sequelize");
+const mongoose = require('mongoose');
 
-const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: process.env.STORAGE,
-});
-
-const connect = async () => {
+const connectDB = async () => {
   try {
-    await sequelize.authenticate();
-    console.log("Database connection has been established successfully.");
-
-    await sequelize.sync({ alter: false });
-    console.log("Models synced successfully.");
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
   }
 };
 
-module.exports = { sequelize, connect };
+module.exports = connectDB;

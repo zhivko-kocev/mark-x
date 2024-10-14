@@ -1,5 +1,14 @@
-Hello {{modelName}} from models!
+using System.ComponentModel.DataAnnotations;
 
-{{#attributes}}
-    {{type}} {{name}}
-{{/attributes}}
+namespace YourNamespace.Models
+{
+    public class {{ModelName}}
+    {
+        public int Id { get; set; }
+
+        {{#attributes}}
+            {{type}} {{name}}
+        {{/attributes}}
+    }
+}
+

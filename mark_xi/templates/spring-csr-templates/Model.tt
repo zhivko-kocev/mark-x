@@ -8,6 +8,7 @@ import lombok.Data;
 
 @Data
 @Entity
+@Table(name = "{{modelName}}s")
 public class {{ModelName}} {
 
     @Id

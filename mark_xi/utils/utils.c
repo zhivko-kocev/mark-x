@@ -241,7 +241,9 @@ int writeToFiles(char *execPath, const Project *project, const ConfigInfo *confi
                     strstr(project->backendType, "csr") ? fullRootPath : configInfo->rootPath,
                     configInfo->dirSetting[j], project->models[i].ModelName,
                     !strcmp(configInfo->fileSetting[j], "Model") ? "" : configInfo->fileSetting[j],
-                    configInfo->extension);
+                    !strcmp(configInfo->fileSetting[j], "Template") || !strcmp(configInfo->fileSetting[j], "View")
+                        ? ".html"
+                        : configInfo->extension);
 
             char templatePath[PATH_MAX + PATH_MAX + MAX_BACKEND];
             sprintf(templatePath, "%s/templates/%s-templates/%s.tt", execPath, project->backendType,
