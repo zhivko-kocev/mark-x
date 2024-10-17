@@ -1,0 +1,18 @@
+{
+    "projectName": "zike",
+    "frontendType": "none",
+    "backendType": "dotnet-ssr",
+    "models": [
+        {
+            "modelName": "krug",
+            "ModelName": "Krug",
+            "attributes": [
+                {
+                    "name": "radius",
+                    "Name": "Radius",
+                    "type": "int"
+                }
+            ]
+        }
+    ]
+}

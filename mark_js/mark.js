@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const inquirer = require("inquirer").default;
-const fs = require("fs");
-const path = require('path');
+// const fs = require("fs");
+// const path = require('path');
 
 const askBasics = () => {
     const questions = [
@@ -189,14 +189,11 @@ const generateProjectJson = async () => {
 const main = async () => {
     try {
         const data = await generateProjectJson();
-
-        const dataFilePath = path.resolve(__dirname, './data.json');
-        fs.writeFileSync(dataFilePath, data);
-        console.log(`Project JSON written to ${dataFilePath}`);
+        process.stdout.write(data);
     } catch (error) {
         console.error('An error occurred:', error);
         process.exit(1);
     }
 };
 
-main().then(() => console.log("Thanks!"));
+main().then(() => console.log(""));

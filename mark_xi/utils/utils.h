@@ -9,16 +9,14 @@
 
 int populateExecutablePath(char *execPath, size_t size);
 
-char *getJsonContent(char *execPath);
+char *getJsonContent();
 
 int populateProjectDetails(Project *project, const char *jsonString);
 
-int createProjectDirectory(const char *projectName);
+int createProjectDirectories(char *execPath, const Project *project);
 
-int writeModelsJSON(const char *jsonString, char *filePath);
+char *getModelJSON(const char *jsonString, int index);
 
 int populateConfig(char *execPath, const Project *model, ConfigInfo *configInfo);
-
-int writeToFiles(char *execPath, const Project *project, const ConfigInfo *configInfo);
 
 #endif //UTILS_H

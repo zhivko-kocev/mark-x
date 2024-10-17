@@ -9,7 +9,7 @@
 #include <libconfig.h>
 #define MAX_NAME 1024
 #define MAX_BACKEND 1024
-
+#define MAX_FRONTEND 1024
 
 int populateExecutablePath(char *execPath, size_t size) {
     const ssize_t count = readlink("/proc/self/exe", execPath, size);
@@ -26,32 +26,35 @@ int populateExecutablePath(char *execPath, size_t size) {
     return 0;
 }
 
-char *getJsonContent(char *execPath) {
-    char jsonPath[PATH_MAX];
-    sprintf(jsonPath, "%s/data.json", execPath);
-
-    FILE *file = fopen(jsonPath, "r");
-    if (file == NULL) {
-        perror("File not found\n");
-        return "err";
+char *getJsonContent() {
+    size_t buffer_size = 2048;
+    char *buffer = malloc(buffer_size);
+    if (!buffer) {
+        perror("Memory allocation failed");
+        return NULL;
     }
 
-    fseek(file, 0, SEEK_END);
-    const long fileSize = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    size_t total_length = 0;
 
-    char *content = malloc(fileSize * sizeof(char));
-    if (!content) {
-        perror("Memory allocation failed\n");
-        fclose(file);
-        return "err";
+    while (fgets(buffer + total_length, (int) buffer_size - (int) total_length, stdin) != NULL) {
+        const size_t len = strlen(buffer + total_length);
+        total_length += len;
+
+        if (total_length >= buffer_size - 1) {
+            buffer_size *= 2;
+            char *new_buffer = realloc(buffer, buffer_size);
+            if (!new_buffer) {
+                perror("Memory allocation failed");
+                free(buffer);
+                return NULL;
+            }
+            buffer = new_buffer;
+        }
     }
 
-    fread(content, 1, fileSize, file);
-    content[fileSize] = '\0';
-    fclose(file);
+    buffer[total_length] = '\0';
 
-    return content;
+    return buffer;
 }
 
 int populateProjectDetails(Project *project, const char *jsonString) {
@@ -109,59 +112,55 @@ int populateProjectDetails(Project *project, const char *jsonString) {
     return 0;
 }
 
-int createProjectDirectory(const char *projectName) {
+int createProjectDirectories(char *execPath, const Project *project) {
     char cwd[PATH_MAX];
     getcwd(cwd, PATH_MAX);
 
     char newDirPath[PATH_MAX + MAX_NAME];
-    sprintf(newDirPath, "%s/%s", cwd, projectName);
+    sprintf(newDirPath, "%s/%s", cwd, project->projectName);
+    if (mkdir(newDirPath, 0777)) {
+        perror("mkdir");
+        return 1;
+    }
 
-    return mkdir(newDirPath, 0777);
+    char setupPath[PATH_MAX + MAX_NAME + MAX_FRONTEND + MAX_BACKEND];
+    sprintf(setupPath, "%s/setup.sh %s %s %s", execPath, project->projectName, project->frontendType,
+            project->backendType);
+
+    return system(setupPath);
 }
 
-int writeModelsJSON(const char *jsonString, char *filePath) {
+char *getModelJSON(const char *jsonString, int index) {
     json_error_t error;
     json_t *root = json_loads(jsonString, 0, &error);
 
     if (!root) {
         printf("Error parsing JSON: %s\n", error.text);
-        return 1;
+        return NULL;
     }
 
     const json_t *models = json_object_get(root, "models");
-    const size_t modelsCount = json_array_size(models);
 
-    for (size_t i = 0; i < modelsCount; ++i) {
-        json_t *new_root = json_object();
-        if (!new_root) {
-            fprintf(stderr, "Failed to create new JSON object\n");
-            json_decref(root);
-            return 1;
-        }
-        const json_t *model = json_array_get(models, i);
-        json_t *nameCapital = json_object_get(model, "ModelName");
-        json_t *nameLower = json_object_get(model, "modelName");
-        json_t *attrs = json_object_get(model, "attributes");
-
-        json_object_set(new_root, "ModelName", nameCapital);
-        json_object_set(new_root, "modelName", nameLower);
-        json_object_set(new_root, "attributes", attrs);
-
-        const char *modelName = json_string_value(json_object_get(model, "ModelName"));
-        char modelPath[PATH_MAX];
-        sprintf(modelPath, "%s/models/%s.json", filePath, modelName);
-
-        if (json_dump_file(new_root, modelPath, JSON_INDENT(4)) != 0) {
-            fprintf(stderr, "Failed to write new JSON to file\n");
-            json_decref(root);
-            json_decref(new_root);
-            return 1;
-        }
-        json_decref(new_root);
+    json_t *new_root = json_object();
+    if (!new_root) {
+        fprintf(stderr, "Failed to create new JSON object\n");
+        json_decref(root);
+        return NULL;
     }
+    const json_t *model = json_array_get(models, index);
+    json_t *nameCapital = json_object_get(model, "ModelName");
+    json_t *nameLower = json_object_get(model, "modelName");
+    json_t *attrs = json_object_get(model, "attributes");
 
+    json_object_set(new_root, "ModelName", nameCapital);
+    json_object_set(new_root, "modelName", nameLower);
+    json_object_set(new_root, "attributes", attrs);
+
+    char *newJsonString = json_dumps(new_root, JSON_INDENT(4));
+
+    json_decref(new_root);
     json_decref(root);
-    return 0;
+    return newJsonString;
 }
 
 int populateConfig(char *execPath, const Project *project, ConfigInfo *configInfo) {
@@ -229,36 +228,3 @@ int populateConfig(char *execPath, const Project *project, ConfigInfo *configInf
     return 0;
 }
 
-int writeToFiles(char *execPath, const Project *project, const ConfigInfo *configInfo) {
-    char fullRootPath[PATH_MAX];
-    sprintf(fullRootPath, "/%s%s", project->backendType, configInfo->rootPath);
-
-    for (size_t i = 0; i < project->modelCount; ++i) {
-        for (size_t j = 0; j < configInfo->dirSettingCount; ++j) {
-            char fullPath[PATH_MAX + PATH_MAX];
-
-            sprintf(fullPath, "./%s%s/%s/%s%s%s", project->projectName,
-                    strstr(project->backendType, "csr") ? fullRootPath : configInfo->rootPath,
-                    configInfo->dirSetting[j], project->models[i].ModelName,
-                    !strcmp(configInfo->fileSetting[j], "Model") ? "" : configInfo->fileSetting[j],
-                    !strcmp(configInfo->fileSetting[j], "Template") || !strcmp(configInfo->fileSetting[j], "View")
-                        ? ".html"
-                        : configInfo->extension);
-
-            char templatePath[PATH_MAX + PATH_MAX + MAX_BACKEND];
-            sprintf(templatePath, "%s/templates/%s-templates/%s.tt", execPath, project->backendType,
-                    configInfo->fileSetting[j]);
-
-            char fullCommand[PATH_MAX * 5 + MAX_BACKEND];
-            sprintf(fullCommand, "cat %s | %s/mu.js %s/models/%s.json > %s", templatePath, execPath, execPath,
-                    project->models[i].ModelName,
-                    fullPath);
-            if (system(fullCommand)) {
-                printf("Failed to execute command\n");
-                return 1;
-            }
-        }
-    }
-
-    return 0;
-}

@@ -15,16 +15,8 @@ int main() {
         return 1;
     }
 
-    char command[PATH_MAX + MAX_NAME];
-    sprintf(command, "rm -rf %s/mark_xi/models/*", execPath);
-    system(command);
-
-    char fullPath[PATH_MAX + MAX_NAME];
-    sprintf(fullPath, "%s/mark_xi/mark.js", execPath);
-
-    system(fullPath);
-
-    sprintf(fullPath, "%s/mark_xi/mark_x", execPath);
+    char fullPath[PATH_MAX + PATH_MAX + MAX_NAME];
+    sprintf(fullPath, "(%s/mark_xi/mark.js) | %s/mark_xi/mark_x", execPath, execPath);
     system(fullPath);
     return 0;
 }

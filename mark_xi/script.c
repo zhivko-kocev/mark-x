@@ -18,8 +18,8 @@ int main() {
     }
 
     char *content = getJsonContent(execPath);
-    if (!strcmp(content, "err")) {
-        printf("Failed to load json content\n");
+    if (!content) {
+        printf("Failed reading from stdin\n");
         return 1;
     }
 
@@ -28,23 +28,10 @@ int main() {
         printf("Failed to load project details\n");
         return 1;
     }
-
-    createProjectDirectory(project.projectName);
-
-    char setupPath[PATH_MAX + MAX_NAME + MAX_FRONTEND + MAX_BACKEND];
-    sprintf(setupPath, "%s/setup.sh %s %s %s", execPath, project.projectName, project.frontendType,
-            project.backendType);
-    system(setupPath);
-
-    if (writeModelsJSON(content, execPath)) {
-        printf("Failed to write models to JSON\n");
+    if (createProjectDirectories(execPath, &project)) {
+        printf("Failed to create project directory\n");
         return 1;
     }
-    free(content);
-
-    // char deleteDataJSON[PATH_MAX + MAX_NAME];
-    // sprintf(deleteDataJSON, "rm -rf %s/data.json", execPath);
-    // system(deleteDataJSON);
 
     ConfigInfo configInfo;
     if (populateConfig(execPath, &project, &configInfo)) {
@@ -52,9 +39,32 @@ int main() {
         return 1;
     }
 
-    if (writeToFiles(execPath, &project, &configInfo)) {
-        printf("Failed to write the templates to the files!\n");
-        return 1;
+    for (size_t i = 0; i < project.modelCount; ++i) {
+        for (size_t j = 0; j < configInfo.dirSettingCount; ++j) {
+            char fullPath[PATH_MAX + PATH_MAX];
+
+            sprintf(fullPath, "./%s%s%s/%s%s%s", project.projectName, configInfo.rootPath,
+                    configInfo.dirSetting[j], project.models[i].ModelName,
+                    !strcmp(configInfo.fileSetting[j], "Model") ? "" : configInfo.fileSetting[j],
+                    !strcmp(configInfo.fileSetting[j], "Template") || !strcmp(configInfo.fileSetting[j], "View")
+                        ? ".html"
+                        : configInfo.extension);
+
+            char templatePath[PATH_MAX + PATH_MAX + MAX_BACKEND];
+            sprintf(templatePath, "%s/templates/%s-templates/%s.tt", execPath, project.backendType,
+                    configInfo.fileSetting[j]);
+
+            char *jsonString = getModelJSON(content, i);
+
+            char fullCommand[PATH_MAX * 8 + MAX_BACKEND];
+            sprintf(fullCommand, "(cat %s;echo 'razdeli';echo '%s') | %s/mu.js > %s", templatePath, jsonString,
+                    execPath,
+                    fullPath);
+            if (system(fullCommand)) {
+                printf("Failed to execute command\n");
+                return 1;
+            }
+        }
     }
 
     return 0;
