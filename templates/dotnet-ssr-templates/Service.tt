@@ -1,0 +1,52 @@
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using YourNamespace.Data;
+using YourNamespace.Models;
+
+namespace YourNamespace.Services
+{
+    public class {{ModelName}}Service
+    {
+        private readonly ApplicationDbContext _context;
+
+        public {{ModelName}}Service(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IEnumerable<{{ModelName}}>> GetAll{{ModelName}}sAsync()
+        {
+            return await _context.{{ModelName}}s.ToListAsync();
+        }
+
+        public async Task<{{ModelName}}> Get{{ModelName}}ByIdAsync(int id)
+        {
+            return await _context.{{ModelName}}s.FindAsync(id);
+        }
+
+        public async Task<{{ModelName}}> Create{{ModelName}}Async({{ModelName}} {{modelName}})
+        {
+            _context.{{ModelName}}s.Add({{modelName}});
+            await _context.SaveChangesAsync();
+            return {{modelName}};
+        }
+
+        public async Task<{{ModelName}}> Update{{ModelName}}Async({{ModelName}} {{modelName}})
+        {
+            _context.Entry({{modelName}}).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return {{modelName}};
+        }
+
+        public async Task Delete{{ModelName}}Async(int id)
+        {
+            var {{modelName}} = await _context.{{ModelName}}s.FindAsync(id);
+            if ({{modelName}} != null)
+            {
+                _context.{{ModelName}}s.Remove({{modelName}});
+                await _context.SaveChangesAsync();
+            }
+        }
+    }
+}

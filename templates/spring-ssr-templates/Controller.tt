@@ -1,0 +1,75 @@
+package com.example.spring_ssr.controllers;
+
+import com.example.spring_ssr.models.{{ModelName}};
+import com.example.spring_ssr.services.{{ModelName}}Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@Controller
+@RequestMapping("/{{modelName}}s")
+public class {{ModelName}}Controller {
+
+    private final {{ModelName}}Service {{modelName}}Service;
+
+    @Autowired
+    public {{ModelName}}Controller({{ModelName}}Service {{modelName}}Service) {
+        this.{{modelName}}Service = {{modelName}}Service;
+    }
+
+    @GetMapping
+    public String list{{ModelName}}s(Model model) {
+        List<{{ModelName}}> {{modelName}}s = {{modelName}}Service.getAll{{ModelName}}s();
+        model.addAttribute("{{modelName}}s", {{modelName}}s);
+        return "{{modelName}}Template";
+    }
+
+    @GetMapping("/{id}")
+    public String view{{ModelName}}(@PathVariable Long id, Model model) {
+        {{ModelName}} {{modelName}} = {{modelName}}Service.get{{ModelName}}ById(id);
+        model.addAttribute("{{modelName}}", {{modelName}});
+        return "";//todo
+    }
+
+    @GetMapping("/new")
+    public String new{{ModelName}}Form(Model model) {
+        model.addAttribute("{{modelName}}", new {{ModelName}}());
+        return "";//todo
+    }
+
+    @PostMapping
+    public String create{{ModelName}}(@ModelAttribute("{{modelName}}") {{ModelName}} {{modelName}}, BindingResult result) {
+        if (result.hasErrors()) {
+            return "";//todo
+        }
+        {{modelName}}Service.save{{ModelName}}({{modelName}});
+        return "";//todo
+    }
+
+    @GetMapping("/{id}/edit")
+    public String edit{{ModelName}}Form(@PathVariable Long id, Model model) {
+        {{ModelName}} {{modelName}} = {{modelName}}Service.get{{ModelName}}ById(id);
+        model.addAttribute("{{modelName}}", {{modelName}});
+        return "";//todo
+    }
+
+    @PostMapping("/{id}")
+    public String update{{ModelName}}(@PathVariable Long id,@ModelAttribute("{{modelName}}") {{ModelName}} {{modelName}}, BindingResult result) {
+        if (result.hasErrors()) {
+            return "";//todo
+        }
+        {{modelName}}.setId(id);
+        {{modelName}}Service.save{{ModelName}}({{modelName}});
+        return "";//todo
+    }
+
+    @PostMapping("/{id}/delete")
+    public String delete{{ModelName}}(@PathVariable Long id) {
+        {{modelName}}Service.delete{{ModelName}}(id);
+        return "";//todo
+    }
+}

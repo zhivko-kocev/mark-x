@@ -1,0 +1,85 @@
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using YourNamespace.Models;
+using YourNamespace.Services;
+
+namespace YourNamespace.Controllers
+{
+    public class {{ModelName}}Controller : Controller
+    {
+        private readonly I{{ModelName}}Service _{{modelName}}Service;
+
+        public {{ModelName}}Controller(I{{ModelName}}Service {{modelName}}Service)
+        {
+            _{{modelName}}Service = {{modelName}}Service;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var {{modelName}}s = await _{{modelName}}Service.GetAll{{ModelName}}sAsync();
+            return View({{modelName}}s);
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var {{modelName}} = await _{{modelName}}Service.Get{{ModelName}}ByIdAsync(id);
+            if ({{modelName}} == null)
+            {
+                return NotFound();
+            }
+            return View({{modelName}});
+        }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Name")] {{ModelName}} {{modelName}})
+        {
+            if (ModelState.IsValid)
+            {
+                await _{{modelName}}Service.Create{{ModelName}}Async({{modelName}});
+                return RedirectToAction(nameof(Index));
+            }
+            return View({{modelName}});
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var {{modelName}} = await _{{modelName}}Service.Get{{ModelName}}ByIdAsync(id);
+            if ({{modelName}} == null)
+            {
+                return NotFound();
+            }
+            return View({{modelName}});
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] {{ModelName}} {{modelName}})
+        {
+            if (id != {{modelName}}.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                await _{{modelName}}Service.Update{{ModelName}}Async({{modelName}});
+                return RedirectToAction(nameof(Index));
+            }
+            return View({{modelName}});
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _{{modelName}}Service.Delete{{ModelName}}Async(id);
+            return RedirectToAction(nameof(Index));
+        }
+    }
+}

@@ -1,0 +1,51 @@
+package com.example.spring_csr.services;
+
+import com.example.spring_csr.models.{{ModelName}};
+import com.example.spring_csr.repositories.{{ModelName}}Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class {{ModelName}}Service {
+
+    private final {{ModelName}}Repository {{modelName}}Repository;
+
+    @Autowired
+    public {{ModelName}}Service({{ModelName}}Repository {{modelName}}Repository) {
+        this.{{modelName}}Repository = {{modelName}}Repository;
+    }
+
+    public List<{{ModelName}}> getAll{{ModelName}}s() {
+        return {{modelName}}Repository.findAll();
+    }
+
+    public Optional<{{ModelName}}> get{{ModelName}}ById(Long id) {
+        return {{modelName}}Repository.findById(id);
+    }
+
+    public {{ModelName}} create{{ModelName}}({{ModelName}} {{modelName}}) {
+        return {{modelName}}Repository.save({{modelName}});
+    }
+
+    public Optional<{{ModelName}}> update{{ModelName}}(Long id, {{ModelName}} {{modelName}}Details) {
+        return {{modelName}}Repository.findById(id)
+            .map(existing{{ModelName}} -> {
+                {{#attributes}}
+                existing{{ModelName}}.set{{Name}}({{modelName}}Details.get{{Name}}());
+                {{/attributes}}
+                return {{modelName}}Repository.save(existing{{ModelName}});
+            });
+    }
+
+    public boolean delete{{ModelName}}(Long id) {
+        return {{modelName}}Repository.findById(id)
+            .map({{modelName}} -> {
+                {{modelName}}Repository.delete({{modelName}});
+                return true;
+            })
+            .orElse(false);
+    }
+}

@@ -1,0 +1,56 @@
+const {{ModelName}} = require('../models/{{modelName}}');
+
+exports.getAll{{ModelName}}s = async (req, res) => {
+  try {
+    const {{modelName}}s = await {{ModelName}}.find();
+    res.json({{modelName}}s);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.get{{ModelName}}ById = async (req, res) => {
+  try {
+    const {{modelName}} = await {{ModelName}}.findById(req.params.id);
+    if (!{{modelName}}) {
+      return res.status(404).json({ message: '{{ModelName}} not found' });
+    }
+    res.json({{modelName}});
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.create{{ModelName}} = async (req, res) => {
+  const {{modelName}} = new {{ModelName}}(req.body);
+  try {
+    const new{{ModelName}} = await {{modelName}}.save();
+    res.status(201).json(new{{ModelName}});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+exports.update{{ModelName}} = async (req, res) => {
+  try {
+    const {{modelName}} = await {{ModelName}}.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!{{modelName}}) {
+      return res.status(404).json({ message: '{{ModelName}} not found' });
+    }
+    res.json({{modelName}});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+exports.delete{{ModelName}} = async (req, res) => {
+  try {
+    const {{modelName}} = await {{ModelName}}.findByIdAndDelete(req.params.id);
+    if (!{{modelName}}) {
+      return res.status(404).json({ message: '{{ModelName}} not found' });
+    }
+    res.json({ message: '{{ModelName}} deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

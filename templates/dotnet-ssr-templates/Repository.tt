@@ -1,0 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using YourNamespace.Models;
+
+namespace YourNamespace.Repositories
+{
+    public interface I{{ModelName}}Repository
+    {
+        Task<IEnumerable<{{ModelName}}>> GetAllAsync();
+        Task<{{ModelName}}> GetByIdAsync(int id);
+        Task<IEnumerable<{{ModelName}}>> FindAsync(Expression<Func<{{ModelName}}, bool>> predicate);
+        Task AddAsync({{ModelName}} entity);
+        Task UpdateAsync({{ModelName}} entity);
+        Task DeleteAsync(int id);
+        Task<bool> ExistsAsync(int id);
+        Task<int> CountAsync();
+    }
+}

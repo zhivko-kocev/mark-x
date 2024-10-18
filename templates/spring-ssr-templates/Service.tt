@@ -1,0 +1,41 @@
+package com.example.spring_ssr.services;
+
+import com.example.spring_ssr.models.{{ModelName}};
+import com.example.spring_ssr.repositories.{{ModelName}}Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class {{ModelName}}Service {
+
+    private final {{ModelName}}Repository {{modelName}}Repository;
+
+    @Autowired
+    public {{ModelName}}Service({{ModelName}}Repository {{modelName}}Repository) {
+        this.{{modelName}}Repository = {{modelName}}Repository;
+    }
+
+    public List<{{ModelName}}> getAll{{ModelName}}s() {
+        return {{modelName}}Repository.findAll();
+    }
+
+    public {{ModelName}} get{{ModelName}}ById(Long id) {
+        Optional<{{ModelName}}> {{modelName}} = {{modelName}}Repository.findById(id);
+        if ({{modelName}}.isPresent()) {
+            return {{modelName}}.get();
+        } else {
+            throw new RuntimeException("{{ModelName}} not found for id: " + id);
+        }
+    }
+
+    public {{ModelName}} save{{ModelName}}({{ModelName}} {{modelName}}) {
+        return {{modelName}}Repository.save({{modelName}});
+    }
+
+    public void delete{{ModelName}}(Long id) {
+        {{modelName}}Repository.deleteById(id);
+    }
+}

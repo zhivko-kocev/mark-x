@@ -1,0 +1,64 @@
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using YourNamespace.Models;
+using YourNamespace.Services;
+
+namespace YourNamespace.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class {{ModelName}}Controller : ControllerBase
+    {
+        private readonly I{{ModelName}}Service _{{modelName}}Service;
+
+        public {{ModelName}}Controller(I{{ModelName}}Service {{modelName}}Service)
+        {
+            _{{modelName}}Service = {{modelName}}Service;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<{{ModelName}}>>> Get{{ModelName}}s()
+        {
+            var {{modelName}}s = await _{{modelName}}Service.GetAll{{ModelName}}sAsync();
+            return Ok({{modelName}}s);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<{{ModelName}}>> Get{{ModelName}}(int id)
+        {
+            var {{modelName}} = await _{{modelName}}Service.Get{{ModelName}}ByIdAsync(id);
+            if ({{modelName}} == null)
+            {
+                return NotFound();
+            }
+            return Ok({{modelName}});
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<{{ModelName}}>> Post{{ModelName}}({{ModelName}} {{modelName}})
+        {
+            var created{{ModelName}} = await _{{modelName}}Service.Create{{ModelName}}Async({{modelName}});
+            return CreatedAtAction(nameof(Get{{ModelName}}), new { id = created{{ModelName}}.Id }, created{{ModelName}});
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put{{ModelName}}(int id, {{ModelName}} {{modelName}})
+        {
+            if (id != {{modelName}}.Id)
+            {
+                return BadRequest();
+            }
+
+            await _{{modelName}}Service.Update{{ModelName}}Async({{modelName}});
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete{{ModelName}}(int id)
+        {
+            await _{{modelName}}Service.Delete{{ModelName}}Async(id);
+            return NoContent();
+        }
+    }
+}

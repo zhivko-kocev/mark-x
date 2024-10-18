@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+
+"$(dirname "${BASH_SOURCE[0]}")"/mark_xi/mark.js
+
+cat data.json | "$(dirname "${BASH_SOURCE[0]}")"/mark
+
+rm data.json

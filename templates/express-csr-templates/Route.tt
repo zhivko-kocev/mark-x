@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const {{modelName}}Controller = require('../controllers/{{modelName}}Controller');
+
+router.get('/', {{modelName}}Controller.getAll{{ModelName}}s);
+router.get('/:id', {{modelName}}Controller.get{{ModelName}}ById);
+router.post('/', {{modelName}}Controller.create{{ModelName}});
+router.put('/:id', {{modelName}}Controller.update{{ModelName}});
+router.delete('/:id', {{modelName}}Controller.delete{{ModelName}});
+
+module.exports = router;

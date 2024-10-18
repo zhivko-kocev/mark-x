@@ -1,0 +1,27 @@
+const mongoose = require('mongoose');
+
+const {{modelName}}Schema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Name is required'],
+    trim: true,
+    minlength: [2, 'Name must be at least 2 characters long'],
+    maxlength: [50, 'Name cannot be more than 50 characters long']
+  },
+  description: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Description cannot be more than 500 characters long']
+  },
+  // Add other fields as needed
+}, {
+  timestamps: true
+});
+
+// Add any pre/post hooks or methods here if needed
+{{modelName}}Schema.pre('save', function(next) {
+  // Custom logic before saving
+  next();
+});
+
+module.exports = mongoose.model('{{ModelName}}', {{modelName}}Schema);
