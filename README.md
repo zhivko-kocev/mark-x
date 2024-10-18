@@ -81,7 +81,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-[Include your chosen license here]
+This project is licensed under the GNU General Public License v3.0. See the LICENSE file for details.
 
 ## Contact
 
